@@ -4,7 +4,7 @@ import express from 'express';
 import path from 'path';
 import url from 'url';
 
-// import routerEmployees from './routers/employees';
+// import routerEmployees from './routes/employees';
 
 const app = express();
 const PORT = process.env.PORT || 5000;
