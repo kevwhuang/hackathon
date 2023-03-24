@@ -1,10 +1,33 @@
 {
-  "dependencies": {
-    "express": "^4.18.2",
-    "mysql2": "^3.2.0",
-    "nodemon": "^2.0.22"
-  },
-  "scripts": {
-    "start": "nodemon ./index.js"
-  }
+    "name": "hackathon",
+    "version": "1.0.0",
+    "description": "",
+    "author": "",
+    "license": "MIT",
+    "main": "src/index.mjs",
+    "scripts": {
+        "eslint": "eslint '**/*.{js,mjs,ts}'",
+        "start": "node src/index.mjs",
+        "test": "jest --watchAll"
+    },
+    "homepage": "https://github.com/kevwhuang/hackathon#readme",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/kevwhuang/hackathon.git"
+    },
+    "bugs": {
+        "url": "https://github.com/kevwhuang/hackathon/issues"
+    },
+    "dependencies": {
+        "cors": "*",
+        "dotenv": "*",
+        "express": "*",
+        "mysql2": "*"
+    },
+    "devDependencies": {
+        "eslint": "*",
+        "eslint-config-airbnb-base": "*",
+        "jest": "*",
+        "nodemon": "*"
+    }
 }
