@@ -9,11 +9,28 @@
     <link rel="stylesheet" href="./normalize.css">
     <link rel="stylesheet" href="./style.css">
 
+    <script src="./test.js" defer></script>
+
     <title>Hackathon</title>
 </head>
 
 <body>
     <h1>Hackathon</h1>
+    <label for="sort-by">Sort by</label>
+    <select name="sort-by" id="sort-by">
+        <option value="id">Employee ID</option>
+        <option value="firstName">First Name</option>
+        <option value="salary">Salary</option>
+        <option value="department">Department</option>
+    </select>
+    <a href="#" id="ascending" class="sc">ascending</a> <a href="#" id="descending" class="sc">descending</a>
+    <form action="#">
+        <input type="text" name="search-query" id="search-query" placeholder="Find employee by ID or first name...">
+        <button id="search-button">Search</button>
+        <a href="#" id="clear">clear results</a>
+    </form>
+    <div id="results"></div>
+    <a href="#" id="prev">prev</a> <a href="#" id="next">next</a>
 </body>
 
 </html>
