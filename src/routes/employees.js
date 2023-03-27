@@ -1,26 +1,25 @@
-import express from "express";
 import { router as employeesRoute } from "./routes/employees.js";
-import { controller as employeesContoller } from "./controllers/employees.js";
+import {
+  controller as getEmployees,
+  getEmployeesById,
+  getEmployeesByFirstName,
+  getSalaryById,
+  getSalaryByFirstName,
+  getEmployeesByDepartment,
+} from "./controllers/employees.js";
 
-// const express = require("express");
-// const router = express.Router();
-// const employeesController = require("../controllers/employees");
+employeesRoute.get("/", getEmployees);
 
-employeesRoute.get("/", employeesController.getEmployees(req, res) => {
-  res.send('getting employees..')
-});
+employeesRoute.get("/:id", getEmployeesById);
 
-employeesRoute.get("/:id", employeesController.getEmployeesById(req, res) => {
-  res.send('getting employees..')
-});
+employeesRoute.get("/firstname/:first_name", getEmployeesByFirstName);
 
-employeesRoute.get("/firstname/:first_name", employeesController.getEmployeesByFirstName(req, res) => {
-  res.send('getting employees..')
-});
+employeesRoute.get("/salary/:id", getSalaryById);
+
+employeesRoute.get("/salary/firstname/:first_name", getSalaryByFirstName);
+
+employeesRoute.get("/department/", getEmployeesByDepartment);
 
 module.exports = router;
 
 
-// getSalaryById
-// getSalaryByFirstName
-// getEmployeesByDepartment
