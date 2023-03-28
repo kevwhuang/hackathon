@@ -20,6 +20,6 @@ employeesRoute.get("/salary/firstname/:first_name", getSalaryByFirstName);
 
 employeesRoute.get("/department/", getEmployeesByDepartment);
 
-module.exports = router;
+export default router;
 
 
