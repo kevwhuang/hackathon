@@ -1,6 +1,4 @@
-const handleSQLError = (res, err) => {
-  console.log("SQL Error: ", err);
-  return res.status(500).send("An unexpected error occurred");
-};
+const notFound = (res, field, value) => res.status(400).json({ error: `<${field}> ${value} not found.` });
+const server = (res, err) => res.status(500).json(err);
 
-export { handleSQLError };
+export default { notFound, server };

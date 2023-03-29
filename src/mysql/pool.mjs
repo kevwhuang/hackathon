@@ -1,26 +1,21 @@
-import dotenv from "dotenv";
-import mysql from "mysql2";
-dotenv.config();
+import mysql from 'mysql2';
 
-class Connection {
-  constructor() {
-    if (!this.pool) {
-      console.log("creating connection...");
-      this.pool = mysql.createPool({
-        connectionLimit: 100,
-        host: process.env.HOST,
-        user: process.env.USERNAME,
-        password: process.env.PASSWORD,
-        database: process.env.DATABASE,
-      });
-
-      return this.pool;
+class Pool {
+    constructor() {
+        if (!this.pool) {
+            this.pool = mysql.createPool({
+                host: process.env.HOST,
+                user: process.env.USERNAME,
+                password: process.env.PASSWORD,
+                database: process.env.DATABASE,
+                connectionLimit: 100,
+                multipleStatements: true,
+            });
+        }
+        return this.pool;
     }
-
-    return this.pool;
-  }
 }
 
-const instance = new Connection();
+const instance = new Pool();
 
 export default instance;

@@ -15,7 +15,14 @@
         "eslint:recommended",
         "airbnb-base"
     ],
-    "plugins": [],
+    "plugins": [
+        "jest"
+    ],
     "overrides": [],
-    "rules": {}
+    "rules": {
+        "indent": [
+            "error",
+            4
+        ]
+    }
 }

@@ -1,5 +1,5 @@
+.env
+tsconfig.json
 **/.DS_Store
 node_modules/
-.env
-/public/test.ts
-tsconfig.json
+public/test.ts

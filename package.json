@@ -1,15 +1,13 @@
 {
     "name": "hackathon",
     "version": "1.0.0",
-    "description": "",
-    "author": "",
+    "author": "Cohort10",
     "license": "MIT",
-    "type": "module",
     "main": "src/index.mjs",
     "scripts": {
-        "eslint": "eslint '**/*.{js,mjs,ts}'",
+        "eslint": "eslint '**/*.{js,mjs}'",
         "start": "nodemon src/index.mjs",
-        "test": "jest --watchAll"
+        "test": "jest --watchAll test/"
     },
     "homepage": "https://github.com/kevwhuang/hackathon#readme",
     "repository": {
@@ -28,6 +26,7 @@
     "devDependencies": {
         "eslint": "*",
         "eslint-config-airbnb-base": "*",
+        "eslint-plugin-jest": "*",
         "jest": "*",
         "nodemon": "*"
     }
