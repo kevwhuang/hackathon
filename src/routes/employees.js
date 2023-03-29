@@ -4,7 +4,7 @@ import {
   getEmployeesById,
   getEmployeesByFirstName,
   getSalaryById,
-  getSalaryByFirstName,
+  getSalaryByName,
   getEmployeesByDepartment,
 } from "./controllers/employees.js";
 
@@ -16,10 +16,10 @@ employeesRoute.get("/firstname/:first_name", getEmployeesByFirstName);
 
 employeesRoute.get("/salary/:id", getSalaryById);
 
-employeesRoute.get("/salary/firstname/:first_name", getSalaryByFirstName);
+employeesRoute.get("/salary/firstname/:first_name", getSalaryByName);
 
 employeesRoute.get("/department/", getEmployeesByDepartment);
 
-module.exports = router;
+export default router;
 
 
