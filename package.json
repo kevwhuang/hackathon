@@ -4,10 +4,11 @@
     "description": "",
     "author": "",
     "license": "MIT",
+    "type": "module",
     "main": "src/index.mjs",
     "scripts": {
         "eslint": "eslint '**/*.{js,mjs,ts}'",
-        "start": "node src/index.mjs",
+        "start": "nodemon src/index.mjs",
         "test": "jest --watchAll"
     },
     "homepage": "https://github.com/kevwhuang/hackathon#readme",

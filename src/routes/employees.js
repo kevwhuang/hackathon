@@ -1,24 +1,18 @@
-import { router as employeesRoute } from "./routes/employees.js";
-import {
-  controller as getEmployees,
-  getEmployeesById,
-  getEmployeesByFirstName,
-  getSalaryById,
-  getSalaryByName,
-  getEmployeesByDepartment,
-} from "./controllers/employees.js";
+import express from "express";
+import employeesController from "../controllers/employees.js";
+const router = express.Router()
 
-employeesRoute.get("/", getEmployees);
+router.get("/", employeesController.getEmployees);
 
-employeesRoute.get("/:id", getEmployeesById);
+router.get("/:id", employeesController.getEmployeesById);
 
-employeesRoute.get("/firstname/:first_name", getEmployeesByFirstName);
+router.get("/firstname/:first_name", employeesController.getEmployeesByFirstName);
 
-employeesRoute.get("/salary/:id", getSalaryById);
+router.get("/salary/:id", employeesController.getSalaryById);
 
-employeesRoute.get("/salary/firstname/:first_name", getSalaryByName);
+router.get("/salary/firstname/:first_name", employeesController.getSalaryByName);
 
-employeesRoute.get("/department/", getEmployeesByDepartment);
+router.get("/department/", employeesController.getEmployeesByDepartment);
 
 export default router;
 

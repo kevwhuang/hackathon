@@ -1,4 +1,6 @@
+import dotenv from "dotenv";
 import mysql from "mysql2";
+dotenv.config();
 
 class Connection {
   constructor() {
@@ -14,10 +16,11 @@ class Connection {
 
       return this.pool;
     }
-  return this.pool;
+
+    return this.pool;
   }
 }
 
 const instance = new Connection();
 
-export { instance };
+export default instance;

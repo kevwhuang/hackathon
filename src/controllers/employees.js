@@ -1,6 +1,6 @@
 import mysql from 'mysql2';
-import pool from '../mysql/pool';
-import { handleSQLError } from '../mysql/errors';
+import pool from '../mysql/pool.mjs';
+import { handleSQLError } from '../mysql/errors.mjs';
 
 const getEmployees = (req, res) => {
   pool.query('select * from employees', (err, rows) => {
