@@ -1,5 +1,6 @@
-import { HOST, DATABASE, PASSWORD, USERNAME } from "dotenv/config";
+import dotenv from "dotenv";
 import mysql from "mysql2";
+dotenv.config();
 
 class Connection {
   constructor() {
@@ -7,10 +8,10 @@ class Connection {
       console.log("creating connection...");
       this.pool = mysql.createPool({
         connectionLimit: 100,
-        host: HOST,
-        user: USERNAME,
-        password: PASSWORD,
-        database: DATABASE,
+        host: process.env.HOST,
+        user: process.env.USERNAME,
+        password: process.env.PASSWORD,
+        database: process.env.DATABASE,
       });
 
       return this.pool;
@@ -22,4 +23,4 @@ class Connection {
 
 const instance = new Connection();
 
-export { instance };
+export default instance;

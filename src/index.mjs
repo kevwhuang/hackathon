@@ -4,6 +4,8 @@ import express from 'express';
 import path from 'path';
 import url from 'url';
 
+import router from './routes/employees.js';
+
 // import routerEmployees from './routes/employees';
 
 const app = express();
@@ -22,6 +24,7 @@ const log = (req, res, next) => {
 
 app.listen(PORT, () => console.log('\x1b[35m%s\x1b[0m', `Server listening on PORT ${PORT}.`));
 
+app.use('/', router)
 app.use(express.json());
 app.use(express.static(path.join(__dirname, '../public')));
 app.use(express.urlencoded({ extended: false }));

@@ -15,6 +15,7 @@ class Employee {
         this.department = department;
     }
 }
+//Fake data
 let employees = [
     new Employee(1, "Bob", "Smith", 80000, "Front End"),
     new Employee(2, "Halle", "Berry", 90000, "Back End"),
@@ -40,6 +41,7 @@ const ascendingButton = $("ascending");
 const descendingButton = $("descending");
 const selectElement = $("sort-by");
 const clearButton = $("clear");
+const testButton = $("test");
 let offset = 0;
 let ascending = true;
 let isSearching = false;
@@ -60,6 +62,13 @@ const randomDepartment = () => {
     const i = Math.floor(Math.random() * departments.length);
     return departments[i];
 };
+testButton.addEventListener("click", (e) => {
+    fetch("http://127.0.0.1:5500/")
+        .then(res => res.json())
+        .then(data => {
+        console.log(data);
+    });
+});
 window.addEventListener("DOMContentLoaded", (e) => {
     fetch("https://randomuser.me/api/?results=1000")
         .then(res => res.json())
