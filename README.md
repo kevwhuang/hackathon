@@ -28,7 +28,7 @@ METHOD|ENDPOINT|DESCRIPTION
 GET | / | List first 1000 employees
 GET | /:emp_no | Search employees by "employee id"
 GET | /firstname/:first_name | Search employees by "first name"
-GET | /department/:dept_name | Search employees by "department name"
+GET | /department/:dept_name | Search first 1000 employees by "department name"
 GET | /salary/:emp_no | Search salaries by "employee id"
 GET | /salary/:first_name/:last_name | Search salaries by "first name" and "last name"
 
