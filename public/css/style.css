@@ -1,15 +1,19 @@
 :root {
     --highlight-color: #00ffcc;
+    --text-color: rgb(234, 234, 234);
+    --background-color: #0f1212;
   }
 
 body {
     text-align: center;
+    background-color: var(--background-color);
+    font-family: 'Arimo', sans-serif;
 }
 
 table, th, td {
     margin: auto;
     margin-top: 1rem;
-    border: solid 0.1rem white;
+    border: solid 0.1rem var(--text-color);
     border-collapse: collapse;
     padding: 0.5rem;
 }
@@ -20,20 +24,21 @@ button {
     border: none;
     margin: 0.5rem;
     cursor: pointer;
+    background-color: #abd5cd;
 }
 
 @media (hover: hover) {
     button:hover {
-        background-color: rgb(144, 144, 144);
+        background-color: #90b4ad;
     }
 }
 
 button:active {
-    background-color: rgb(130, 130, 130);
+    background-color: #77958f;
 }
 
 a, a:visited {
-    color: white;
+    color: var(--text-color);
 }
 
 #ascending {
@@ -41,12 +46,20 @@ a, a:visited {
 }
 
 #search-query {
-    width: 18rem;
+    margin: 0.5rem;
+    margin-right: 0rem;
+    width: 15rem;
 }
 
 #results {
-    margin-top: 1rem;
-    margin-bottom: 1rem;
+    margin: 1rem;
+    margin-top: 0;
+    overflow-x: scroll;
+}
+
+#progress {
+    display: none;
+    margin: auto;
 }
 
 #clear {

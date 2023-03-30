@@ -2,55 +2,221 @@ import mysql from 'mysql2';
 import pool from '../mysql/pool.mjs';
 import { handleSQLError } from '../mysql/errors.mjs';
 
+const limit = 50;
+
 const getEmployees = (req, res) => {
-  pool.query('select * from employees', (err, rows) => {
-    if (err) return handleSQLError(res, err);
-    return res.json(rows);
-  });
-};
-
-const getEmployeesById = (req, res) => {
-  let sql = 'select * from employees where emp_no = ?';
-  sql = mysql.format(sql, [req.params.emp_no]);
+  let offset = 0;
+  let order = "ASC";
+  let column = "emp_no";
+  if (req.query.order) {
+    order = "DESC";
+  }
+  if (req.query.offset && !isNaN(req.query.offset)) {
+    offset = parseInt(req.query.offset);
+  }
+  if (req.query.column) {
+    switch (req.query.column.toLowerCase()) {
+      case "first_name":
+        column = "first_name";
+        break;
+      case "last_name":
+        column = "last_name";
+        break;
+      case "salary":
+        column = "salary";
+        break;
+      case "dept_no":
+        column = "dept_no";
+        break;
+      default:
+        column = "emp_no";
+        break;
+    }
+  }
+  let sql = `SELECT e.emp_no, e.first_name, e.last_name, s.salary, de.dept_no
+            FROM employees e
+            JOIN (
+              SELECT emp_no, MAX(salary) AS max_salary
+              FROM salaries
+              GROUP BY emp_no
+            ) AS max_salaries ON e.emp_no = max_salaries.emp_no
+            JOIN salaries s ON e.emp_no = s.emp_no AND s.salary = max_salaries.max_salary
+            JOIN dept_emp de ON e.emp_no = de.emp_no
+            JOIN (
+              SELECT emp_no, MAX(from_date) AS max_from_date
+              FROM dept_emp
+              GROUP BY emp_no
+            ) AS max_dept_dates ON de.emp_no = max_dept_dates.emp_no AND de.from_date = max_dept_dates.max_from_date
+            ORDER BY ${column} ${order}
+            LIMIT ${limit}
+            OFFSET ?;`;
+  sql = mysql.format(sql, [offset]);
   pool.query(sql, (err, rows) => {
     if (err) return handleSQLError(res, err);
     return res.json(rows);
   });
 };
 
-const getEmployeesByFirstName = (req, res) => {
-  let sql = 'select * from employees where first_name = ?';
-  sql = mysql.format(sql, [req.params.first_name]);
+const searchEmployees = (req, res) => {
+  const searchQuery = req.query.query;
+  let offset = 0;
+  let order = "ASC";
+  let column = "emp_no";
+  if (req.query.order) {
+    order = "DESC";
+  }
+  if (req.query.offset && !isNaN(req.query.offset)) {
+    offset = parseInt(req.query.offset);
+  }
+  if (req.query.column) {
+    switch (req.query.column.toLowerCase()) {
+      case "first_name":
+        column = "first_name";
+        break;
+      case "last_name":
+        column = "last_name";
+        break;
+      case "salary":
+        column = "salary";
+        break;
+      case "dept_no":
+        column = "dept_no";
+        break;
+      default:
+        column = "emp_no";
+        break;
+    }
+  }
+
+  if (!searchQuery) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  const searchTerms = searchQuery.split("+").filter((term) => term.trim() !== "");
+  let sql = `SELECT e.emp_no, e.first_name, e.last_name, s.salary, de.dept_no
+            FROM employees e
+            JOIN (
+              SELECT emp_no, MAX(salary) AS max_salary
+              FROM salaries
+              GROUP BY emp_no
+            ) AS max_salaries ON e.emp_no = max_salaries.emp_no
+            JOIN salaries s ON e.emp_no = s.emp_no AND s.salary = max_salaries.max_salary
+            JOIN dept_emp de ON e.emp_no = de.emp_no
+            JOIN (
+              SELECT emp_no, MAX(from_date) AS max_from_date
+              FROM dept_emp
+              GROUP BY emp_no
+            ) AS max_dept_dates ON de.emp_no = max_dept_dates.emp_no AND de.from_date = max_dept_dates.max_from_date
+            WHERE (e.emp_no = ?) OR (e.first_name LIKE ?) OR (e.last_name LIKE ?) OR (e.first_name LIKE ? AND e.last_name LIKE ?)
+            ORDER BY ${column} ${order}
+            LIMIT ${limit}
+            OFFSET ?;`;
+
+  const searchParams = searchTerms.map((term) => `%${term}%`);
+
+  const empNoParams = [searchQuery];
+  const firstNameParams = searchTerms.length > 0 ? [searchParams[0]] : ['%'];
+  const lastNameParams = searchTerms.length > 1 ? [searchParams[1]] : searchTerms.length === 1 ? [searchParams[0]] : ['%'];
+
+  sql = mysql.format(sql, [
+    ...empNoParams,
+    ...firstNameParams,
+    ...lastNameParams,
+    ...firstNameParams,
+    ...lastNameParams,
+    offset
+  ]);
+
   pool.query(sql, (err, rows) => {
     if (err) return handleSQLError(res, err);
     return res.json(rows);
   });
 };
 
-const getSalaryById = (req, res) => {
-  let sql = 'select * from salaries where emp_no = ? order by to_date desc';
-  sql = mysql.format(sql, [req.params.emp_no]);
+const getCount = (req, res) => {
+  let sql = `SELECT COUNT(*) as count_emps
+            FROM (
+              SELECT e.emp_no, e.first_name, e.last_name, s.salary, de.dept_no
+              FROM employees e
+              JOIN (
+                SELECT emp_no, MAX(salary) AS max_salary
+                FROM salaries
+                GROUP BY emp_no
+              ) AS max_salaries ON e.emp_no = max_salaries.emp_no
+              JOIN salaries s ON e.emp_no = s.emp_no AND s.salary = max_salaries.max_salary
+              JOIN dept_emp de ON e.emp_no = de.emp_no
+              JOIN (
+                SELECT emp_no, MAX(from_date) AS max_from_date
+                FROM dept_emp
+                GROUP BY emp_no
+              ) AS max_dept_dates ON de.emp_no = max_dept_dates.emp_no AND de.from_date = max_dept_dates.max_from_date
+            ) as result`
+  sql = mysql.format(sql);
   pool.query(sql, (err, rows) => {
     if (err) return handleSQLError(res, err);
     return res.json(rows);
   });
 };
 
-// requires two values: first_name and last_name
-const getSalaryByName = (req, res) => {
-  let sql = 'select a.emp_no, salary, from_date, to_date from employees a join salaries b on a.emp_no = b.emp_no where first_name = ? and last_name = ? order by to_date desc';
-  sql = mysql.format(sql, [req.params.first_name, req.params.last_name]);
-  pool.query(sql, (err, rows) => {
-    if (err) return handleSQLError(res, err);
-    return res.json(rows);
-  });
-};
+const getCountSearch = (req, res) => {
+  const searchQuery = req.query.query;
+  let column = "emp_no";
+  if (req.query.column) {
+    switch (req.query.column.toLowerCase()) {
+      case "first_name":
+        column = "first_name";
+        break;
+      case "last_name":
+        column = "last_name";
+        break;
+      case "salary":
+        column = "salary";
+        break;
+      case "dept_no":
+        column = "dept_no";
+        break;
+      default:
+        column = "emp_no";
+        break;
+    }
+  }
 
-// Query interpreting the date '9999-01-01' to mean 'to present'.
-// Ignores employees who left department.
-const getEmployeesByDepartment = (req, res) => {
-  let sql = "select a.emp_no, birth_date, first_name, last_name, gender, hire_date, from_date, c.dept_no, dept_name from employees a  join dept_emp b  on a.emp_no = b.emp_no join departments c on b.dept_no = c.dept_no where dept_name = ? and to_date = '9999-01-01';";
-  sql = mysql.format(sql, [req.params.dept_no]);
+  if (!searchQuery) {
+    return res.status(400).json({ error: "Search query is required" });
+  }
+
+  const searchTerms = searchQuery.split("+").filter((term) => term.trim() !== "");
+  let sql = `SELECT COUNT(*) as count_emps
+            FROM (
+              SELECT e.emp_no, e.first_name, e.last_name, s.salary, de.dept_no
+              FROM employees e
+              JOIN (
+                SELECT emp_no, MAX(salary) AS max_salary
+                FROM salaries
+                GROUP BY emp_no
+              ) AS max_salaries ON e.emp_no = max_salaries.emp_no
+              JOIN salaries s ON e.emp_no = s.emp_no AND s.salary = max_salaries.max_salary
+              JOIN dept_emp de ON e.emp_no = de.emp_no
+              JOIN (
+                SELECT emp_no, MAX(from_date) AS max_from_date
+                FROM dept_emp
+                GROUP BY emp_no
+              ) AS max_dept_dates ON de.emp_no = max_dept_dates.emp_no AND de.from_date = max_dept_dates.max_from_date
+              WHERE (e.emp_no = ?) OR (e.first_name LIKE ?) OR (e.last_name LIKE ?) OR (e.first_name LIKE ? AND e.last_name LIKE ?)
+            ) as result`
+  const searchParams = searchTerms.map((term) => `%${term}%`);
+
+  const empNoParams = [searchQuery];
+  const firstNameParams = searchTerms.length > 0 ? [searchParams[0]] : ['%'];
+  const lastNameParams = searchTerms.length > 1 ? [searchParams[1]] : searchTerms.length === 1 ? [searchParams[0]] : ['%'];
+
+  sql = mysql.format(sql, [
+    ...empNoParams,
+    ...firstNameParams,
+    ...lastNameParams,
+    ...firstNameParams,
+    ...lastNameParams
+  ]);
   pool.query(sql, (err, rows) => {
     if (err) return handleSQLError(res, err);
     return res.json(rows);
@@ -59,11 +225,9 @@ const getEmployeesByDepartment = (req, res) => {
 
 export default {
   getEmployees,
-  getEmployeesById,
-  getEmployeesByFirstName,
-  getSalaryById,
-  getSalaryByName,
-  getEmployeesByDepartment,
+  searchEmployees,
+  getCount,
+  getCountSearch
 };
 
 // TODO=========================

@@ -15,36 +15,21 @@ class Employee {
         this.department = department;
     }
 }
-//Fake data
-let employees = [
-    new Employee(1, "Bob", "Smith", 80000, "Front End"),
-    new Employee(2, "Halle", "Berry", 90000, "Back End"),
-    new Employee(3, "Alex", "Johnson", 120000, "Senior Engineer"),
-    new Employee(4, "Tim", "Burton", 90000, "Back End"),
-    new Employee(5, "Reese", "Witherspoon", 90000, "Front End"),
-    new Employee(6, "Tim", "Curry", 95000, "Back End"),
-    new Employee(7, "Avril", "Lavigne", 90000, "Back End"),
-    new Employee(8, "Eve", "Freeman", 90000, "Back End"),
-    new Employee(9, "Jayce", "Davis", 90000, "Back End"),
-    new Employee(10, "Mia", "Pennington", 90000, "Back End"),
-    new Employee(11, "Bobby", "Ware", 90000, "Back End"),
-    new Employee(12, "Emily", "Garza", 90000, "Back End")
-];
-let results = [];
-let sortArray = [...employees];
 const searchInput = $("search-query");
 const searchButton = $("search-button");
 const resultsElement = $("results");
+const resultCountElement = $("result-count");
 const prevButton = $("prev");
 const nextButton = $("next");
 const ascendingButton = $("ascending");
 const descendingButton = $("descending");
 const selectElement = $("sort-by");
 const clearButton = $("clear");
-const testButton = $("test");
+const progressButton = $("progress");
 let offset = 0;
-let ascending = true;
-let isSearching = false;
+let isAscending = true;
+let column = "emp_no";
+let resultCount = 0;
 const randomSalary = () => {
     const max = 201;
     const min = 80;
@@ -62,128 +47,61 @@ const randomDepartment = () => {
     const i = Math.floor(Math.random() * departments.length);
     return departments[i];
 };
-testButton.addEventListener("click", (e) => {
-    fetch("http://127.0.0.1:5500/")
-        .then(res => res.json())
-        .then(data => {
-        console.log(data);
-    });
-});
 window.addEventListener("DOMContentLoaded", (e) => {
-    fetch("https://randomuser.me/api/?results=1000")
-        .then(res => res.json())
-        .then(data => {
-        let i = 1;
-        if (data.results) {
-            employees.length = 0;
-            for (let person of data.results) {
-                employees.push(new Employee(i, person.name.first, person.name.last, randomSalary(), randomDepartment()));
-                i++;
-            }
-        }
-        sortArray = [...employees];
-        offset = 0;
-        sortEmployees();
-    });
+    loadEmployees();
 });
 prevButton.addEventListener("click", (e) => {
     e.preventDefault();
     if (offset - 50 >= 0) {
         offset -= 50;
-        loadEmployees();
+        let searchQuery = searchInput.value || "";
+        loadEmployees(searchQuery);
     }
 });
 nextButton.addEventListener("click", (e) => {
     e.preventDefault();
-    if (offset + 50 < sortArray.length) {
+    if (offset + 50 < resultCount) {
         offset += 50;
-        loadEmployees();
+        let searchQuery = searchInput.value || "";
+        loadEmployees(searchQuery);
     }
 });
 ascendingButton.addEventListener("click", (e) => {
     e.preventDefault();
-    ascending = true;
+    isAscending = true;
     ascendingButton.style.color = "var(--highlight-color)";
     descendingButton.style.color = "white";
-    sortEmployees();
+    loadEmployees();
 });
 descendingButton.addEventListener("click", (e) => {
     e.preventDefault();
-    ascending = false;
+    isAscending = false;
     descendingButton.style.color = "var(--highlight-color)";
     ascendingButton.style.color = "white";
-    sortEmployees();
+    loadEmployees();
 });
 selectElement.addEventListener("change", (e) => {
-    sortEmployees();
+    column = selectElement.value;
+    loadEmployees();
 });
 searchButton.addEventListener("click", (e) => {
     e.preventDefault();
-    searchEmployees();
+    offset = 0;
+    loadEmployees(searchInput.value);
 });
 clearButton.addEventListener("click", (e) => {
     e.preventDefault();
-    results.length = 0;
     clearButton.style.display = "none";
-    isSearching = false;
-    sortArray = [...employees];
     searchInput.value = "";
     loadEmployees();
 });
-const searchEmployees = () => {
-    isSearching = true;
-    clearButton.style.display = "block";
+const loadEmployees = (searchQuery = "") => {
     resultsElement.innerHTML = "";
-    const query = searchInput.value.toLowerCase();
-    const regex = new RegExp(/[0-9]/, 'g');
-    results.length = 0;
-    if (query.match(regex)) {
-        results = employees.filter(emp => {
-            return query === emp.id.toString();
-        });
-    }
-    else {
-        results = employees.filter(emp => {
-            return query === emp.firstName.toLowerCase();
-        });
-    }
-    sortArray = [...results];
-    if (results.length > 0) {
-        const employeeTable = document.createElement("table");
-        resultsElement.appendChild(employeeTable);
-        const headerRow = document.createElement("tr");
-        const tHeaders = ["ID", "First Name", "Last Name", "Salary", "Department"];
-        for (let h of tHeaders) {
-            const th = document.createElement("th");
-            th.textContent = h;
-            headerRow.appendChild(th);
-        }
-        employeeTable.appendChild(headerRow);
-        for (let i = 0; i < offset + 50; i++) {
-            if (!results[i]) {
-                break;
-            }
-            const emp = results[i];
-            const values = ["id", "firstName", "lastName", "salary", "department"];
-            const tr = document.createElement("tr");
-            for (let value of values) {
-                const td = document.createElement("td");
-                td.textContent = emp[value].toString();
-                tr.appendChild(td);
-            }
-            employeeTable.appendChild(tr);
-        }
-        let pElement = document.createElement("p");
-        let max = offset + 50 > results.length ? results.length : offset + 50;
-        pElement.textContent = `Showing ${offset + 1}-${max} of ${results.length}`;
-        resultsElement.appendChild(pElement);
-    }
-    else {
-        resultsElement.textContent = "No matching result";
-    }
-};
-const loadEmployees = () => {
-    resultsElement.innerHTML = "";
+    resultCountElement.innerHTML = "";
+    progressButton.style.display = "block";
+    let pElement = document.createElement("p");
+    pElement.textContent = "Loading...";
+    resultCountElement.appendChild(pElement);
     const employeeTable = document.createElement("table");
     resultsElement.appendChild(employeeTable);
     const headerRow = document.createElement("tr");
@@ -194,55 +112,68 @@ const loadEmployees = () => {
         headerRow.appendChild(th);
     }
     employeeTable.appendChild(headerRow);
-    for (let i = offset; i < offset + 50; i++) {
-        if (!sortArray[i]) {
-            break;
+    let orderQuery = "";
+    if (!isAscending) {
+        orderQuery = "order=DESC&";
+    }
+    let offsetQuery = "";
+    if (offset > 0) {
+        offsetQuery = `offset=${offset}&`;
+    }
+    let columnQuery = "";
+    if (column !== "emp_no") {
+        columnQuery = `column=${column}&`;
+    }
+    let fetchURL = `/api?${orderQuery}${offsetQuery}${columnQuery}`;
+    if (searchQuery) {
+        searchQuery = searchQuery.replace(" ", "+");
+        fetchURL = `/api/search?query=${searchQuery}&${orderQuery}${offsetQuery}${columnQuery}`;
+    }
+    let countFetchURL = "/api/count";
+    if (searchQuery) {
+        countFetchURL = `/api/count/search?query=${searchQuery}&${orderQuery}${offsetQuery}${columnQuery}`;
+    }
+    Promise.all([
+        fetch(fetchURL)
+            .then(res => res.json())
+            .then(data => {
+            let employees = [];
+            if (data) {
+                for (let employee of data) {
+                    employees.push(new Employee(employee.emp_no, employee.first_name, employee.last_name, employee.salary, employee.dept_no.toUpperCase()));
+                }
+                for (let i = 0; i < 50; i++) {
+                    const emp = employees[i];
+                    if (!emp) {
+                        break;
+                    }
+                    const values = ["id", "firstName", "lastName", "salary", "department"];
+                    const tr = document.createElement("tr");
+                    for (let value of values) {
+                        const td = document.createElement("td");
+                        let dollar = value === "salary" ? "$" : "";
+                        td.textContent = dollar + emp[value].toLocaleString("en-US");
+                        tr.appendChild(td);
+                    }
+                    employeeTable.appendChild(tr);
+                }
+            }
+        }),
+        fetch(countFetchURL)
+            .then(res => res.json())
+            .then(data => {
+            resultCountElement.innerHTML = "";
+            resultCount = data[0].count_emps;
+            let pElement = document.createElement("p");
+            let max = offset + 50 > resultCount ? resultCount : offset + 50;
+            pElement.textContent = `Showing ${offset + 1}-${max} of ${resultCount}`;
+            resultCountElement.appendChild(pElement);
+        })
+    ])
+        .then(() => {
+        progressButton.style.display = "none";
+        if (searchQuery) {
+            clearButton.style.display = "block";
         }
-        const emp = sortArray[i];
-        const values = ["id", "firstName", "lastName", "salary", "department"];
-        const tr = document.createElement("tr");
-        for (let value of values) {
-            const td = document.createElement("td");
-            td.textContent = emp[value].toLocaleString("en-US");
-            tr.appendChild(td);
-        }
-        employeeTable.appendChild(tr);
-    }
-    let pElement = document.createElement("p");
-    let max = offset + 50 > sortArray.length ? sortArray.length : offset + 50;
-    pElement.textContent = `Showing ${offset + 1}-${max} of ${sortArray.length}`;
-    resultsElement.appendChild(pElement);
-};
-const sortEmployees = () => {
-    const sortBy = selectElement.value;
-    sortArray.length = 0;
-    if (isSearching) {
-        sortArray = [...results];
-    }
-    else {
-        sortArray = [...employees];
-    }
-    if (ascending) {
-        sortArray = sortArray.sort((a, b) => {
-            if (a[sortBy] > b[sortBy]) {
-                return 1;
-            }
-            else if (a[sortBy] < b[sortBy]) {
-                return -1;
-            }
-            return 0;
-        });
-    }
-    else {
-        sortArray = sortArray.sort((a, b) => {
-            if (a[sortBy] < b[sortBy]) {
-                return 1;
-            }
-            else if (a[sortBy] > b[sortBy]) {
-                return -1;
-            }
-            return 0;
-        });
-    }
-    loadEmployees();
+    });
 };

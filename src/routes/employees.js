@@ -4,16 +4,10 @@ const router = express.Router()
 
 router.get("/", employeesController.getEmployees);
 
-router.get("/:emp_no", employeesController.getEmployeesById);
+router.get("/search/", employeesController.searchEmployees);
 
-router.get("/firstname/:first_name", employeesController.getEmployeesByFirstName);
+router.get("/count/", employeesController.getCount)
 
-router.get("/salary/:emp_no", employeesController.getSalaryById);
-
-router.get("/salary/:first_name&:last_name", employeesController.getSalaryByName);
-
-router.get("/department/", employeesController.getEmployeesByDepartment);
+router.get("/count/search/", employeesController.getCountSearch)
 
 export default router;
-
-

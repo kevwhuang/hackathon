@@ -20,7 +20,7 @@ const log = (req, res, next) => {
     next();
 };
 
-app.listen(PORT, () => console.log('\x1b[35m%s\x1b[0m', `Server listening on PORT ${PORT}.`));
+app.listen(PORT, "127.0.0.1", () => console.log('\x1b[35m%s\x1b[0m', `Server listening on PORT ${PORT}.`));
 
 app.use('/api', router)
 app.use(express.json());
