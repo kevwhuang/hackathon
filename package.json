@@ -6,7 +6,7 @@
     "main": "src/index.mjs",
     "scripts": {
         "eslint": "eslint '**/*.{js,mjs}'",
-        "start": "nodemon src/index.mjs",
+        "start": "node src/index.mjs",
         "test": "jest --watchAll test/"
     },
     "homepage": "https://github.com/kevwhuang/hackathon#readme",
