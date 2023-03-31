@@ -1,4 +1,5 @@
 "use strict";
+
 const $ = (id) => {
     const element = document.getElementById(id);
     if (!(element instanceof HTMLElement)) {
@@ -6,6 +7,7 @@ const $ = (id) => {
     }
     return element;
 };
+
 class Employee {
     constructor(id, firstName, lastName, salary, department) {
         this.id = id;
@@ -15,7 +17,7 @@ class Employee {
         this.department = department;
     }
 }
-//Fake data
+
 let employees = [
     new Employee(1, "Bob", "Smith", 80000, "Front End"),
     new Employee(2, "Halle", "Berry", 90000, "Back End"),
@@ -30,8 +32,10 @@ let employees = [
     new Employee(11, "Bobby", "Ware", 90000, "Back End"),
     new Employee(12, "Emily", "Garza", 90000, "Back End")
 ];
+
 let results = [];
 let sortArray = [...employees];
+
 const searchInput = $("search-query");
 const searchButton = $("search-button");
 const resultsElement = $("results");
@@ -41,15 +45,17 @@ const ascendingButton = $("ascending");
 const descendingButton = $("descending");
 const selectElement = $("sort-by");
 const clearButton = $("clear");
-const testButton = $("test");
+
 let offset = 0;
 let ascending = true;
 let isSearching = false;
+
 const randomSalary = () => {
     const max = 201;
     const min = 80;
     return Math.floor(Math.random() * (max - min) + min) * 1000;
 };
+
 const randomDepartment = () => {
     const departments = ["Administrative",
         "Business",
@@ -62,30 +68,25 @@ const randomDepartment = () => {
     const i = Math.floor(Math.random() * departments.length);
     return departments[i];
 };
-testButton.addEventListener("click", (e) => {
-    fetch("http://127.0.0.1:5500/")
-        .then(res => res.json())
-        .then(data => {
-        console.log(data);
-    });
-});
+
 window.addEventListener("DOMContentLoaded", (e) => {
     fetch("https://randomuser.me/api/?results=1000")
         .then(res => res.json())
         .then(data => {
-        let i = 1;
-        if (data.results) {
-            employees.length = 0;
-            for (let person of data.results) {
-                employees.push(new Employee(i, person.name.first, person.name.last, randomSalary(), randomDepartment()));
-                i++;
+            let i = 1;
+            if (data.results) {
+                employees.length = 0;
+                for (let person of data.results) {
+                    employees.push(new Employee(i, person.name.first, person.name.last, randomSalary(), randomDepartment()));
+                    i++;
+                }
             }
-        }
-        sortArray = [...employees];
-        offset = 0;
-        sortEmployees();
-    });
+            sortArray = [...employees];
+            offset = 0;
+            sortEmployees();
+        });
 });
+
 prevButton.addEventListener("click", (e) => {
     e.preventDefault();
     if (offset - 50 >= 0) {
@@ -93,6 +94,7 @@ prevButton.addEventListener("click", (e) => {
         loadEmployees();
     }
 });
+
 nextButton.addEventListener("click", (e) => {
     e.preventDefault();
     if (offset + 50 < sortArray.length) {
@@ -100,6 +102,7 @@ nextButton.addEventListener("click", (e) => {
         loadEmployees();
     }
 });
+
 ascendingButton.addEventListener("click", (e) => {
     e.preventDefault();
     ascending = true;
@@ -107,6 +110,7 @@ ascendingButton.addEventListener("click", (e) => {
     descendingButton.style.color = "white";
     sortEmployees();
 });
+
 descendingButton.addEventListener("click", (e) => {
     e.preventDefault();
     ascending = false;
@@ -114,13 +118,16 @@ descendingButton.addEventListener("click", (e) => {
     ascendingButton.style.color = "white";
     sortEmployees();
 });
+
 selectElement.addEventListener("change", (e) => {
     sortEmployees();
 });
+
 searchButton.addEventListener("click", (e) => {
     e.preventDefault();
     searchEmployees();
 });
+
 clearButton.addEventListener("click", (e) => {
     e.preventDefault();
     results.length = 0;
@@ -130,6 +137,7 @@ clearButton.addEventListener("click", (e) => {
     searchInput.value = "";
     loadEmployees();
 });
+
 const searchEmployees = () => {
     isSearching = true;
     clearButton.style.display = "block";
@@ -182,6 +190,7 @@ const searchEmployees = () => {
         resultsElement.textContent = "No matching result";
     }
 };
+
 const loadEmployees = () => {
     resultsElement.innerHTML = "";
     const employeeTable = document.createElement("table");
@@ -213,6 +222,7 @@ const loadEmployees = () => {
     pElement.textContent = `Showing ${offset + 1}-${max} of ${sortArray.length}`;
     resultsElement.appendChild(pElement);
 };
+
 const sortEmployees = () => {
     const sortBy = selectElement.value;
     sortArray.length = 0;

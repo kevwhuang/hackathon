@@ -1,12 +1,14 @@
 :root {
     --highlight-color: #00ffcc;
-  }
+}
 
 body {
     text-align: center;
 }
 
-table, th, td {
+table,
+th,
+td {
     margin: auto;
     margin-top: 1rem;
     border: solid 0.1rem white;
@@ -32,7 +34,8 @@ button:active {
     background-color: rgb(130, 130, 130);
 }
 
-a, a:visited {
+a,
+a:visited {
     color: white;
 }
 
